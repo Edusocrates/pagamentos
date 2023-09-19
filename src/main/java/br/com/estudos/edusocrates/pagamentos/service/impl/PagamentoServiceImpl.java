@@ -77,4 +77,17 @@ public class PagamentoServiceImpl implements PagamentoService {
         pedido.atualizaPagamento(pagamento.get().getPedidoId());
     }
 
+    @Override
+    public void alteraStatus(Long id) {
+        Optional<Pagamento> pagamento = pagamentoRepository.findById(id);
+
+        if (!pagamento.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        pagamento.get().setStatus(Status.CONFIRMADO_SEM_INTEGRACAO);
+        pagamentoRepository.save(pagamento.get());
+
+    }
+
 }
