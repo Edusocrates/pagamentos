@@ -16,4 +16,6 @@ public interface PagamentoService {
     PagamentoDTO atualizarPagamento(Long id, PagamentoDTO dto);
 
     void excluirPagamento(Long id);
+
+    void confirmarPagamento(Long id);
 }

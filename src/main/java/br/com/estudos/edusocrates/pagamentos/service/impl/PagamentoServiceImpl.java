@@ -1,5 +1,6 @@
 package br.com.estudos.edusocrates.pagamentos.service.impl;
 
+import br.com.estudos.edusocrates.pagamentos.http.PedidoClient;
 import br.com.estudos.edusocrates.pagamentos.model.DTO.PagamentoDTO;
 import br.com.estudos.edusocrates.pagamentos.model.Pagamento;
 import br.com.estudos.edusocrates.pagamentos.model.Status;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
 
 @Service
 public class PagamentoServiceImpl implements PagamentoService {
@@ -21,6 +23,9 @@ public class PagamentoServiceImpl implements PagamentoService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private PedidoClient pedido;
 
     @Override
     public Page<PagamentoDTO> obterTodos(Pageable paginacao) {
@@ -59,5 +64,17 @@ public class PagamentoServiceImpl implements PagamentoService {
         pagamentoRepository.deleteById(id);
     }
 
+    @Override
+    public void confirmarPagamento(Long id){
+        Optional<Pagamento> pagamento = pagamentoRepository.findById(id);
+
+        if (!pagamento.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        pagamento.get().setStatus(Status.CONFIRMADO);
+        pagamentoRepository.save(pagamento.get());
+        pedido.atualizaPagamento(pagamento.get().getPedidoId());
+    }
 
 }
